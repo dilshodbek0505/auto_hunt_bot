@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
-import firebase_admin
-from firebase_admin import credentials
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,8 +43,8 @@ DJANGO_APPS = [
 
 CUSTOM_APPS = [
     "apps.common",
-    "apps.notification",
     "apps.user",
+    "apps.bot",
 ]
 
 THIRD_PARTY_APPS = [
@@ -54,6 +52,7 @@ THIRD_PARTY_APPS = [
     "drf_yasg",
     "corsheaders",
     "modeltranslation",
+    "django_celery_beat",
 ]
 
 REST_FRAMEWORK = {
@@ -73,6 +72,7 @@ INSTALLED_APPS = DJANGO_APPS + CUSTOM_APPS + THIRD_PARTY_APPS
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -156,6 +156,10 @@ STATICFILES_DIRS = (BASE_DIR / "staticfiles",)
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+LOCALE_PATHS = [
+    BASE_DIR / 'locales'
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -170,6 +174,7 @@ CACHES = {
     }
 }
 
+REDIS_URL = f"{env.str('REDIS_URL', 'redis://localhost:6379/0')}"
 REDIS_HOST = env.str("REDIS_HOST", "localhost")
 REDIS_PORT = env.int("REDIS_PORT", 6379)
 REDIS_DB = env.int("REDIS_DB", 0)
@@ -187,10 +192,6 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 # AES
 AES_KEY = env.str("AES_KEY", "")
 
-
-# firebase settings
-cred = credentials.Certificate(BASE_DIR / "serviceAccountKey.json")
-firebase_admin.initialize_app(cred)
 
 # cors headers settings
 CORS_ALLOW_ALL_ORIGINS = True

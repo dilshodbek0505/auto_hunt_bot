@@ -15,3 +15,10 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
+
+app.conf.beat_schedule = {
+    "send_post_task": {
+        "task": "apps.bot.tasks.car_info_periodic_task",
+        "schedule": 600
+    }
+}
